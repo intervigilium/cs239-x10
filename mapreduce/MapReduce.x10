@@ -65,6 +65,6 @@ public class MapReduce {
             new MapReduce().run();
         }
         val stop = Timer.milliTime();
-        Console.OUT.println("Wall-clock time for mapreduce: " + (stop - start) * 1000 + " secs");
+        Console.OUT.println("Wall-clock time for mapreduce: " + (stop - start) / 1000 + " secs");
     }
 }
