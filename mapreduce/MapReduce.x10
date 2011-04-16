@@ -34,7 +34,7 @@ public class MapReduce {
     }
 
     public def reduce() {
-        val h: Place = here;
+        val h = here;
         val reg = a.region;
         val dis = reg->here;
         val result: Array[Int] = new Array[Int](dis);
