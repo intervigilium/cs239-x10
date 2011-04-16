@@ -4,26 +4,15 @@ import x10.array.Dist;
 import x10.array.DistArray;
 
 public class MapReduce {
-    public static def main(Array[String]) {
-	    val tmr = new Timer();
-	    var count:Int = 0;
-        val start = Timer.milliTime();
-	    finish {
-            new MR().run();
-        }
-        val stop = Timer.milliTime();
-	    Console.OUT.println("Wall-clock time for mapreduce: " + (stop - start) * 1000 + " secs");
-	}
-}
 
-public class MR {
     val reg = (0..300000);
-    var a: Array[Int];
+    var a: DistArray[Int];
     var total: Int;
 
-    public MR() {
+    public def MapReduce() {
         val dist = Dist.makeBlock(reg);
         a = DistArray.make[Int](dist);
+
         total = 0;
     }
 
@@ -66,5 +55,16 @@ public class MR {
         for (p in result) {
             total = total + result(p);
         }
+    }
+
+    public static def main(args:Array[String]) {
+        val tmr = new Timer();
+        var count:Int = 0;
+        val start = Timer.milliTime();
+        finish {
+            new MapReduce().run();
+        }
+        val stop = Timer.milliTime();
+        Console.OUT.println("Wall-clock time for mapreduce: " + (stop - start) * 1000 + " secs");
     }
 }
