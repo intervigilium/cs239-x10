@@ -43,9 +43,9 @@ public class MR {
     for (point(:rank==1) p: a) {
       finish {
         final int[:rank==1] c = a;
-        async(a.distribution.get(p)) { 
+        async at (a.distribution.get(p)) { 
           final int v = c[p];
-          async(h) { 
+          async at (h) { 
             result[p]=v; // Update the corresponding slot in the result array
           }
         }
