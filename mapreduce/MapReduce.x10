@@ -23,7 +23,7 @@ public class MapReduce {
     }
 
     public def map() {
-        val b: Array[Int] = a;
+        val b = a;
         finish ateach (p in b) {
             b(p) = f(b(p));
         }
