@@ -9,7 +9,7 @@ public class MapReduce {
     var a: DistArray[Int];
     var total: Int;
 
-    public def MapReduce() {
+    public def this() {
         val dist = Dist.makeBlock(reg);
         a = DistArray.make[Int](dist);
 
