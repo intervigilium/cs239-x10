@@ -11,9 +11,17 @@ public class MapReduce {
 
     public def this() {
         val dist = Dist.makeBlock(reg);
-        a = DistArray.make[Int](dist);
-
+        a = DistArray.make[Int](dist, ([i]:Point(1)) => i);
         total = 0;
+    }
+
+    public def printArray() {
+        val ref = a;
+        finish for (place in ref.dist.places()) async at (place) {
+            for (p in ref|here) {
+                Console.OUT.println(ref(p));
+            }
+        }
     }
 
     public def run() {
