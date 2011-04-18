@@ -31,9 +31,11 @@ public class MapReduce {
     }
 
     public def map() {
-        val b = a;
-        finish ateach (p in b) {
-            b(p) = f(b(p));
+        val ref = a;
+        finish for (place in ref.dist.places()) async at (place) {
+            for (p in ref|here) async {
+                ref(p) = f(ref(p));
+            }
         }
     }
 
