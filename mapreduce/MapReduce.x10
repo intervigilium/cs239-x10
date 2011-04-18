@@ -18,7 +18,7 @@ public class MapReduce {
     public def printArray() {
         val ref = a;
         finish for (place in ref.dist.places()) async at (place) {
-            for (p in ref|here) {
+            for (p in ref) {
                 Console.OUT.println(ref(p));
             }
         }
@@ -33,7 +33,7 @@ public class MapReduce {
     public def map() {
         val ref = a;
         finish for (place in ref.dist.places()) async at (place) {
-            for (p in ref|here) async {
+            for (p in ref) async {
                 ref(p) = f(ref(p));
             }
         }
