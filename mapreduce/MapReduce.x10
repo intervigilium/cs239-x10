@@ -44,22 +44,16 @@ public class MapReduce {
     }
 
     public def reduce() {
-        val h = here;
-        val reg = a.region;
-        val dis = reg->here;
-        val result: Array[Int] = new Array[Int](dis);
-        // Create an final array having a "slot" reserved 
-        // for the result of each iteration
-        for (p in a) {
-            finish {
-                val c: Array[Int] = a;
-                async at (a.dist.get(p)) {
-                    val v: Int = c(p);
-                    async at (h) {
-                        result(p) = v;
-                    }
+        val ref = a;
+        val result: Array[Int] = new Array[Int](Place.MAX_PLACES);
+        finish for (place in ref.dist().places()) async {
+            result(place.id) = at (place) {
+                var localSum: Int = 0;
+                for (p in ref) {
+                    localSum += ref(p);
                 }
-            }
+                localSum
+            };
         }
 
         for (p in result) {
