@@ -46,7 +46,7 @@ public class MapReduce {
     public def reduce() {
         val ref = a;
         val result: Array[Int] = new Array[Int](Place.MAX_PLACES);
-        finish for (place in ref.dist().places()) async {
+        finish for (place in ref.dist.places()) async {
             result(place.id) = at (place) {
                 var localSum: Int = 0;
                 for (p in ref) {
