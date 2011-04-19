@@ -8,6 +8,8 @@ SRC = ${OUT}.x10
 
 all: cpp
 
+run: run-cpp
+
 java:
 	${X10J} ${SRC}
 
