@@ -65,10 +65,10 @@ public class MapReduce {
                                     ref(p) = localArray(p - iter) + localArray(p);
                                 }
                             }
-                            iter *= 2;
-                            flip = !flip;
                         }
                     }
+                    iter *= 2;
+                    flip = !flip;
                 }
 
                 if (flip) {
