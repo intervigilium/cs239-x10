@@ -43,6 +43,45 @@ public class MapReduce {
         return x*x;
     }
 
+    public def reduceLog() {
+        val ref = a;
+        val result: Array[Int] = new Array[Int](Place.MAX_PLACES);
+        finish for (place in ref.dist.places()) async {
+            result(place.id) = at (place) {
+                val max = ref.dist.get(place).size();
+                val localArray: Array[Int] = new Array[Int](ref.dist.region.size());
+                var iter: Int = 1;
+                var flip: Boolean = false;
+                var res: Int;
+                while (iter < max) {
+                    finish for (p in ref) {
+                        if (p(0) >= iter) {
+                            if (flip) {
+                                async {
+                                    localArray(p) = ref(p - iter) + ref(p);
+                                }
+                            } else {
+                                async {
+                                    ref(p) = localArray(p - iter) + localArray(p);
+                                }
+                            }
+                            iter *= 2;
+                            flip = !flip;
+                        }
+                    }
+                }
+
+                if (flip) {
+                    res = ref(max - 1);
+                } else {
+                    res = localArray(max - 1);
+                }
+                res
+            };
+        }
+
+    }
+
     public def reduce() {
         val ref = a;
         val result: Array[Int] = new Array[Int](Place.MAX_PLACES);
