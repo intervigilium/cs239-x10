@@ -80,6 +80,9 @@ public class MapReduce {
             };
         }
 
+        for (p in result) {
+            total = total + result(p);
+        }
     }
 
     public def reduce() {
