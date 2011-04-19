@@ -1,3 +1,5 @@
 *.class
 *.java
+*.h
+*.cc
 x10-src/*
