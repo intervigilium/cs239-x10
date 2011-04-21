@@ -18,7 +18,7 @@ public class MapReduce {
     public def printArray() {
         val ref = a;
         finish for (place in ref.dist.places()) async at (place) {
-            for (p in ref) {
+            for (p in ref|here) {
                 Console.OUT.println(ref(p));
             }
         }
@@ -33,7 +33,7 @@ public class MapReduce {
     public def map() {
         val ref = a;
         finish for (place in ref.dist.places()) async at (place) {
-            for (p in ref) async {
+            for (p in ref|here) async {
                 ref(p) = f(ref(p));
             }
         }
@@ -54,7 +54,7 @@ public class MapReduce {
                 var flip: Boolean = false;
                 var res: Int;
                 while (iter < max) {
-                    finish for (p in ref) {
+                    finish for (p in ref|here) {
                         if (p(0) >= iter) {
                             if (flip) {
                                 async {
@@ -91,7 +91,7 @@ public class MapReduce {
         finish for (place in ref.dist.places()) async {
             result(place.id) = at (place) {
                 var localSum: Int = 0;
-                for (p in ref) {
+                for (p in ref|here) {
                     localSum += ref(p);
                 }
                 localSum
