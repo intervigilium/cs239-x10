@@ -25,6 +25,7 @@ public class MapReduce {
     }
 
     public def run() {
+        Console.OUT.println("MapReduce using " + Place.MAX_PLACES + " places");
         map();
         reduce();
         Console.OUT.println(total);
