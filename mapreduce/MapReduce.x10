@@ -50,33 +50,23 @@ public class MapReduce {
         finish for (place in ref.dist.places()) async {
             result(place.id) = at (place) {
                 val max = ref.dist.get(place).size();
-                val localArray: Array[Int] = new Array[Int](ref.dist.region.size());
-                var iter: Int = 1;
-                var flip: Boolean = false;
                 var res: Int;
-                while (iter < max) {
-                    finish for (p in ref|here) {
-                        if (p(0) >= iter) {
-                            if (flip) {
-                                async {
-                                    localArray(p) = ref(p - iter) + ref(p);
-                                }
-                            } else {
-                                async {
-                                    ref(p) = localArray(p - iter) + localArray(p);
-                                }
+                Console.OUT.println("place " + place.id + " max " + max);
+                for (var iter: Int = 1; iter < max; iter *= 2) {
+                    finish for (p in ref|place) {
+                        if (p(0) - iter >= place.id * max) {
+                            val sum: Int;
+                            finish async {
+                                sum = ref(p) + ref(p(0) - iter);
+                            }
+                            finish async {
+                                ref(p) = sum;
                             }
                         }
                     }
-                    iter *= 2;
-                    flip = !flip;
                 }
 
-                if (flip) {
-                    res = ref(max - 1);
-                } else {
-                    res = localArray(max - 1);
-                }
+                res = ref((place.id + 1) * max - 1);
                 res
             };
         }
