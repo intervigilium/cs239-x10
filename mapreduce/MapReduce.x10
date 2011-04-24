@@ -47,8 +47,8 @@ public class MapReduce {
     def logParallelReduce(val arr: DistArray[Int], val place: Place): Int {
         val max = arr.dist.get(place).size();
         val offset = place.id * max;
-        finish for (var iter: Int = 1; iter < max; iter *= 2) {
-            val sum: Array[Int] = new Array[Int](max);
+        val sum: Array[Int] = new Array[Int](max);
+        for (var iter: Int = 1; iter < max; iter *= 2) {
             finish for (p in arr|place) {
                 if (p(0) - iter >= offset) {
                     async {
@@ -69,8 +69,8 @@ public class MapReduce {
     }
 
     def logParallelReduce(val arr: Array[Int]): Int {
-        finish for (var iter: Int = 1; iter < arr.size; iter *= 2) {
-            var sum: Array[Int] = new Array[Int](arr.size);
+        val sum: Array[Int] = new Array[Int](arr.size);
+        for (var iter: Int = 1; iter < arr.size; iter *= 2) {
             finish for (var i: Int = 0; i < arr.size; i++) {
                 if (i - iter >= 0) {
                     val j = i;
