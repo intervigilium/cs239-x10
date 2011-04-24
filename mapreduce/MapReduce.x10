@@ -49,18 +49,14 @@ public class MapReduce {
         val offset = place.id * max;
         val sum: Array[Int] = new Array[Int](max);
         for (var iter: Int = 1; iter < max; iter *= 2) {
-            finish for (p in arr|place) {
+            finish for (p in arr|place) async {
                 if (p(0) - iter >= offset) {
-                    async {
-                        sum(p(0) - offset) = arr(p) + arr(p(0) - iter);
-                    }
+                    sum(p(0) - offset) = arr(p) + arr(p(0) - iter);
                 }
             }
-            finish for (p in arr|place) {
+            finish for (p in arr|place) async {
                 if (p(0) - iter >= offset) {
-                    async {
-                        arr(p) = sum(p(0) - offset);
-                    }
+                    arr(p) = sum(p(0) - offset);
                 }
             }
         }
@@ -71,20 +67,14 @@ public class MapReduce {
     def logParallelReduce(val arr: Array[Int]): Int {
         val sum: Array[Int] = new Array[Int](arr.size);
         for (var iter: Int = 1; iter < arr.size; iter *= 2) {
-            finish for (var i: Int = 0; i < arr.size; i++) {
-                if (i - iter >= 0) {
-                    val j = i;
-                    async {
-                        sum(j) = arr(j) + arr(j - iter);
-                    }
+            finish for (p in arr) async {
+                if (p(0) - iter >= 0) {
+                    sum(p) = arr(p) + arr(p(0) - iter);
                 }
             }
-            finish for (var i: Int = 0; i < arr.size; i++) {
-                if (i - iter >= 0) {
-                    val j = i;
-                    async {
-                        arr(j) = sum(j);
-                    }
+            finish for (p in arr) async {
+                if (p(0) - iter >= 0) {
+                    arr(p) = sum(p);
                 }
             }
         }
