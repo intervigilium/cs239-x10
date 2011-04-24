@@ -84,6 +84,6 @@ public class ParallelPrefix {
             new ParallelPrefix().run();
         }
         val stop = Timer.milliTime();
-        Console.OUT.println("Wall-clock time for mapreduce: " + (stop - start) / 1000.0 + " secs");
+        Console.OUT.println("Wall-clock time for parallel prefix sum: " + (stop - start) / 1000.0 + " secs");
     }
 }
