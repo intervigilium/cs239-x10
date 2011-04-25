@@ -17,22 +17,21 @@ public class MapReduce {
 
     public def run() {
         Console.OUT.println("MapReduce using " + Place.MAX_PLACES + " places");
-        map();
+        val f: (Int) => Int = (x: Int) => {
+            return x * x;
+        };
+        map(f);
         reduceLog();
         Console.OUT.println(total);
     }
 
-    public def map() {
+    public def map(f: (Int) => Int) {
         val ref = a;
         finish for (place in ref.dist.places()) async at (place) {
             for (p in ref|here) async {
                 ref(p) = f(ref(p));
             }
         }
-    }
-
-    public def f(val x: Int): Int {
-        return x*x;
     }
 
     def logParallelReduce(val arr: DistArray[Int], val place: Place): Int {
