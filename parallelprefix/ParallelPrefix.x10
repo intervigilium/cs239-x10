@@ -15,7 +15,7 @@ public class ParallelPrefix {
 
     public def printArray() {
         val ref = a;
-        finish for (place in ref.dist.places()) async at (place) {
+        finish for (place in ref.dist.places()) at (place) {
             for (p in ref|here) {
                 Console.OUT.println(ref(p));
             }
