@@ -15,19 +15,10 @@ public class MapReduce {
         total = 0;
     }
 
-    public def printArray() {
-        val ref = a;
-        finish for (place in ref.dist.places()) async at (place) {
-            for (p in ref|here) {
-                Console.OUT.println(ref(p));
-            }
-        }
-    }
-
     public def run() {
         Console.OUT.println("MapReduce using " + Place.MAX_PLACES + " places");
         map();
-        reduce();
+        reduceLog();
         Console.OUT.println(total);
     }
 
