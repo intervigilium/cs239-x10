@@ -5,7 +5,7 @@ import x10.array.DistArray;
 
 public class ParallelPrefix {
 
-    val reg = (0..300000);
+    val reg = (0..20);
     var a: DistArray[Int];
 
     public def this() {
@@ -50,11 +50,12 @@ public class ParallelPrefix {
     }
 
     def mapHere(val arr: DistArray[Int], f: (Int) => Int): Int {
+        val end = arr.dist.get(here).max(0);
         val max = arr.dist.get(here).size();
         finish for (p in arr|here) async {
             arr(p) = f(arr(p));
         }
-        return arr((here.id + 1) * max - 1);
+        return arr(end);
     }
 
     public def prefixSum() {
