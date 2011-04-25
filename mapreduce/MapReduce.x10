@@ -34,27 +34,27 @@ public class MapReduce {
         }
     }
 
-    def logParallelReduce(val arr: DistArray[Int], val place: Place): Int {
-        val max = arr.dist.get(place).size();
-        val offset = place.id * max;
+    def reduceHere(val arr: DistArray[Int]): Int {
+        val max = arr.dist.get(here).size();
+        val offset = here.id * max;
         val sum: Array[Int] = new Array[Int](max);
         for (var iter: Int = 1; iter < max; iter *= 2) {
-            finish for (p in arr|place) async {
+            finish for (p in arr|here) async {
                 if (p(0) - iter >= offset) {
                     sum(p(0) - offset) = arr(p) + arr(p(0) - iter);
                 }
             }
-            finish for (p in arr|place) async {
+            finish for (p in arr|here) async {
                 if (p(0) - iter >= offset) {
                     arr(p) = sum(p(0) - offset);
                 }
             }
         }
 
-        return arr((place.id + 1) * max - 1);
+        return arr((here.id + 1) * max - 1);
     }
 
-    def logParallelReduce(val arr: Array[Int]): Int {
+    def reducePlaces(val arr: Array[Int]): Int {
         val sum: Array[Int] = new Array[Int](arr.size);
         for (var iter: Int = 1; iter < arr.size; iter *= 2) {
             finish for (p in arr) async {
@@ -77,13 +77,13 @@ public class MapReduce {
         val result: Array[Int] = new Array[Int](Place.MAX_PLACES);
         finish for (place in ref.dist.places()) async {
             result(place.id) = at (place) {
-                logParallelReduce(ref, place)
+                reduceHere(ref)
             };
         }
-        total = logParallelReduce(result);
+        total = reducePlaces(result);
     }
 
-    public def reduce() {
+    public def reduceParallel() {
         val ref = a;
         val result: Array[Int] = new Array[Int](Place.MAX_PLACES);
         finish for (place in ref.dist.places()) async {
