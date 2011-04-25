@@ -28,7 +28,7 @@ public class ParallelPrefix {
         printArray();
     }
 
-    def logParallelReduce(val arr: DistArray[Int], val place: Place): Int {
+    def reduceAtPlace(val arr: DistArray[Int], val place: Place): Int {
         val max = arr.dist.get(place).size();
         val offset = place.id * max;
         val sum: Array[Int] = new Array[Int](max);
@@ -58,18 +58,18 @@ public class ParallelPrefix {
 
     public def prefixSum() {
         val ref = a;
-        val result: Array[Int] = new Array[Int](Place.MAX_PLACES);
+        val placeSum: Array[Int] = new Array[Int](Place.MAX_PLACES);
         finish for (place in ref.dist.places()) async {
-            result(place.id) = at (place) {
-                logParallelReduce(ref, place)
+            placeSum(place.id) = at (place) {
+                reduceAtPlace(ref, place)
             };
         }
         for (var iter: Int = 1; iter <= Place.MAX_PLACES; iter *= 2) {
             val i = iter;
             finish for (place in ref.dist.places()) async {
                 if (place.id - i >= 0) {
-                    result(place.id) = at (place) {
-                        mapSum(ref, place, result(place.id - i))
+                    placeSum(place.id) = at (place) {
+                        mapSum(ref, place, placeSum(place.id - i))
                     };
                 }
             }
