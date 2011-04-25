@@ -5,7 +5,7 @@ import x10.array.DistArray;
 
 public class ParallelPrefix {
 
-    val reg = (0..15);
+    val reg = (0..300000);
     var a: DistArray[Int];
 
     public def this() {
@@ -29,23 +29,24 @@ public class ParallelPrefix {
     }
 
     def reduceHere(val arr: DistArray[Int]): Int {
-        val max = arr.dist.get(here).size();
-        val offset = here.id * max;
-        val sum: Array[Int] = new Array[Int](max);
-        for (var iter: Int = 1; iter < max; iter *= 2) {
+        val size = arr.dist.get(here).size();
+        val start = arr.dist.get(here).min(0);
+        val end = arr.dist.get(here).max(0);
+        val sum: Array[Int] = new Array[Int](size);
+        for (var iter: Int = 1; iter < size; iter *= 2) {
             finish for (p in arr|here) async {
-                if (p(0) - iter >= offset) {
-                    sum(p(0) - offset) = arr(p) + arr(p(0) - iter);
+                if (p(0) - iter >= start) {
+                    sum(p(0) - start) = arr(p) + arr(p(0) - iter);
                 }
             }
             finish for (p in arr|here) async {
-                if (p(0) - iter >= offset) {
-                    arr(p) = sum(p(0) - offset);
+                if (p(0) - iter >= start) {
+                    arr(p) = sum(p(0) - start);
                 }
             }
         }
 
-        return arr((here.id + 1) * max - 1);
+        return arr(end);
     }
 
     def mapHere(val arr: DistArray[Int], f: (Int) => Int): Int {
