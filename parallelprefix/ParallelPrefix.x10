@@ -28,32 +28,32 @@ public class ParallelPrefix {
         printArray();
     }
 
-    def reduceAtPlace(val arr: DistArray[Int], val place: Place): Int {
-        val max = arr.dist.get(place).size();
-        val offset = place.id * max;
+    def reduceHere(val arr: DistArray[Int]): Int {
+        val max = arr.dist.get(here).size();
+        val offset = here.id * max;
         val sum: Array[Int] = new Array[Int](max);
         for (var iter: Int = 1; iter < max; iter *= 2) {
-            finish for (p in arr|place) async {
+            finish for (p in arr|here) async {
                 if (p(0) - iter >= offset) {
                     sum(p(0) - offset) = arr(p) + arr(p(0) - iter);
                 }
             }
-            finish for (p in arr|place) async {
+            finish for (p in arr|here) async {
                 if (p(0) - iter >= offset) {
                     arr(p) = sum(p(0) - offset);
                 }
             }
         }
 
-        return arr((place.id + 1) * max - 1);
+        return arr((here.id + 1) * max - 1);
     }
 
-    def mapSum(val arr: DistArray[Int], val place: Place, val sum: Int): Int {
-        val max = arr.dist.get(place).size();
-        finish for (p in arr|place) async {
-            arr(p) += sum;
+    def mapHere(val arr: DistArray[Int], f: (Int) => Int): Int {
+        val max = arr.dist.get(here).size();
+        finish for (p in arr|here) async {
+            arr(p) = f(arr(p));
         }
-        return arr((place.id + 1) * max - 1);
+        return arr((here.id + 1) * max - 1);
     }
 
     public def prefixSum() {
@@ -61,7 +61,7 @@ public class ParallelPrefix {
         val placeSum: Array[Int] = new Array[Int](Place.MAX_PLACES);
         finish for (place in ref.dist.places()) async {
             placeSum(place.id) = at (place) {
-                reduceAtPlace(ref, place)
+                reduceHere(ref)
             };
         }
         for (var iter: Int = 1; iter <= Place.MAX_PLACES; iter *= 2) {
@@ -69,7 +69,10 @@ public class ParallelPrefix {
             finish for (place in ref.dist.places()) async {
                 if (place.id - i >= 0) {
                     placeSum(place.id) = at (place) {
-                        mapSum(ref, place, placeSum(place.id - i))
+                        val f: (Int) => Int = (x: Int) => {
+                            return x + placeSum(place.id - i);
+                        };
+                        mapHere(ref, f)
                     };
                 }
             }
