@@ -1,5 +1,8 @@
 *.class
-*.java
+distarraysum/*.java
+mapreduce/*.java
+parallelprefix/*.java
+showdistributions/*.java
 *.h
 *.cc
 x10-src/*
