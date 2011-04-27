@@ -1,7 +1,9 @@
 *.class
 distarraysum/*.java
 mapreduce/*.java
+mapreduce/MapReduce
 parallelprefix/*.java
+parallelprefix/ParallelPrefix
 showdistributions/*.java
 *.h
 *.cc
