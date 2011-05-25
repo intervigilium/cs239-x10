@@ -9,4 +9,3 @@ showdistributions/*.java
 *.class
 *.out
 *.out.jj
-x10-src/*
