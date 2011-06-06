@@ -8,7 +8,7 @@ SRC = ${OUT}.java
 INPUT_DIR = x10
 INPUT_FILE = Series.x10
 
-all: run
+all: build
 
 build:
 	${JAVAC} ${SRC}
