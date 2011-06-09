@@ -137,6 +137,20 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
      */
 	public void visit(final BlockStatement n) {
         super.visit(n);
+
+        Mol current;
+        switch (n.f0.which) {
+            case 3:
+                // statement
+                current = statements.get(n.f0.choice);
+                break;
+            default:
+                current = new Mol();
+                current.l.add(n);
+                break;
+        }
+
+        statements.put(n, current);
 	}
 
     /*
