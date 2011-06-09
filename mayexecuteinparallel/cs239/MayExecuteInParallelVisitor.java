@@ -33,8 +33,39 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         }
     }
 
+    public void visit(final Expression n) {
+        super.visit(n);
+
+        Mol current = new Mol();
+
+        // expressions not previously being recorded
+        current.l.add(n.f0.choice);
+
+        statements.put(n.f0.choice, current);
+    }
+
 	public void visit(final Statement n) {
-		n.f0.accept(this);
+        super.visit(n);
+        switch (n.f0.which) {
+            case 1:
+                // Async
+                break;
+            case 3:
+                // Finish
+                break;
+            case 5:
+                // Loop
+                break;
+            case 10:
+                // While
+                break;
+            default:
+                Mol current = new Mol();
+                current.l.add(n.f0.choice);
+
+                statements.put(n.f0.choice, current);
+                break;
+        }
 	}
 
     /*
@@ -65,9 +96,15 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         Mol expression = statements.get(n.f2);
         Mol block = statements.get(n.f4);
 
+        // do expression and block
         current.m.addAll(block.m);
+        current.m.addAll(expression.m);
+        current.m.addAll(symCross(expression.o, block.l));
+        // async s: M, L, L
         current.o.addAll(block.l);
+        current.o.addAll(expression.l);
         current.l.addAll(block.l);
+        current.l.addAll(expression.l);
         current.l.add(n);
 
         statements.put(n, current);
@@ -103,6 +140,7 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         Mol current = new Mol();
         Mol statement = statements.get(n.f1);
 
+        // finish s: M, empty, L
         current.m.addAll(statement.m);
         current.l.addAll(statement.l);
         current.l.add(n);
@@ -125,15 +163,6 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
 		n.f3.accept(this);
 		n.f4.accept(this);
 		n.f5.accept(this);
-	}
-
-    /*
-     * f0: 'else'
-     * f1: Statement
-     */
-	public void visit(final ElseClause n) {
-		n.f0.accept(this);
-		n.f1.accept(this);
 	}
 
     /*
