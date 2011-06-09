@@ -8,6 +8,7 @@ public class Main {
             INode root = new MiniX10Parser(System.in).File();
             MayExecuteInParallelVisitor scanner = new MayExecuteInParallelVisitor();
             root.accept(scanner);
+            scanner.printOutput();
         } catch (ParseException e) {
             System.out.println(e.toString());
         }
