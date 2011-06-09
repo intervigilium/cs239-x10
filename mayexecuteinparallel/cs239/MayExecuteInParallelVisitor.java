@@ -86,21 +86,15 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         Mol block = statements.get(n.f4);
 
         // do expression and block
-        if (block != null) {
-            current.m.addAll(block.m);
-            current.o.addAll(block.l);
-            current.l.addAll(block.l);
-        }
+        current.m.addAll(block.m);
+        current.o.addAll(block.l);
+        current.l.addAll(block.l);
 
-        if (expression != null) {
-            current.m.addAll(expression.m);
-            current.o.addAll(expression.l);
-            current.l.addAll(expression.l);
-        }
+        current.m.addAll(expression.m);
+        current.o.addAll(expression.l);
+        current.l.addAll(expression.l);
 
-        if (block != null && expression != null) {
-            current.m.addAll(symCross(expression.o, block.l));
-        }
+        current.m.addAll(symCross(expression.o, block.l));
         current.l.add(n);
 
         statements.put(n, current);
@@ -120,12 +114,10 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
             INode node = i.next();
             Mol mol = statements.get(node);
 
-            if (mol != null) {
-                current.m.addAll(mol.m);
-                current.o.addAll(mol.o);
-                current.l.addAll(mol.l);
-                current.m.addAll(symCross(current.o, mol.l));
-            }
+            current.m.addAll(mol.m);
+            current.o.addAll(mol.o);
+            current.l.addAll(mol.l);
+            current.m.addAll(symCross(current.o, mol.l));
         }
         statements.put(n, current);
 	}
@@ -164,10 +156,8 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         Mol statement = statements.get(n.f1);
 
         // finish s: M, empty, L
-        if (statement != null) {
-            current.m.addAll(statement.m);
-            current.l.addAll(statement.l);
-        }
+        current.m.addAll(statement.m);
+        current.l.addAll(statement.l);
         current.l.add(n);
 
         statements.put(n, current);
@@ -207,21 +197,15 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         Mol statement = statements.get(n.f7);
         Mol expression = statements.get(n.f5);
 
-        if (expression != null) {
-            current.m.addAll(expression.m);
-            current.o.addAll(expression.o);
-            current.l.addAll(expression.l);
-        }
+        current.m.addAll(expression.m);
+        current.o.addAll(expression.o);
+        current.l.addAll(expression.l);
 
-        if (statement != null) {
-            current.m.addAll(statement.m);
-            current.o.addAll(statement.o);
-            current.l.addAll(statement.l);
-        }
+        current.m.addAll(statement.m);
+        current.o.addAll(statement.o);
+        current.l.addAll(statement.l);
 
-        if (expression != null && statement != null) {
-            current.m.addAll(symCross(statement.o, expression.l));
-        }
+        current.m.addAll(symCross(statement.o, expression.l));
         current.m.addAll(symCross(current.o, current.l));
         current.l.add(n);
 
