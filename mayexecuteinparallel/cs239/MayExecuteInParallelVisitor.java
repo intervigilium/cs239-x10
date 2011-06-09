@@ -81,21 +81,25 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         super.visit(n);
         
         Mol current = new Mol();
+        Mol tmp = new Mol();
 
         Mol expression = statements.get(n.f2);
         Mol block = statements.get(n.f4);
 
-        // do expression and block
-        current.m.addAll(block.m);
-        current.o.addAll(block.l);
-        current.l.addAll(block.l);
+        tmp.m.addAll(block.m);
+        tmp.o.addAll(block.o);
+        tmp.l.addAll(block.l);
 
-        current.m.addAll(expression.m);
-        current.o.addAll(expression.l);
-        current.l.addAll(expression.l);
+        tmp.m.addAll(expression.m);
+        tmp.o.addAll(expression.o);
+        tmp.l.addAll(expression.l);
 
-        current.m.addAll(symCross(expression.o, block.l));
-        current.l.add(n);
+        tmp.m.addAll(symCross(expression.o, block.l));
+        tmp.l.add(n);
+
+        current.m.addAll(tmp.m);
+        current.o.addAll(tmp.l);
+        current.l.addAll(tmp.l);
 
         statements.put(n, current);
 	}
