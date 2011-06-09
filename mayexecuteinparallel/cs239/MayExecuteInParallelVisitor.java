@@ -6,6 +6,33 @@ import java.util.*;
 
 public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
 
+    private HashMap<INode, Mol> statements;
+
+    public MayExecuteInParallelVisitor() {
+        statements = new HashMap<INode, Mol>();
+    }
+
+    private static HashSet<LabelPair> symCross(HashSet<INode> l0, HashSet<INode> l1) {
+        HashSet<LabelPair> res = new HashSet<LabelPair>();
+        for (Iterator<INode> i = l0.iterator(); i.hasNext(); ) {
+            INode n0 = i.next();
+            for (Iterator<INode> j = l1.iterator(); j.hasNext(); ) {
+                INode n1 = i.next();
+                res.add(new LabelPair(n0, n1));
+            }
+        }
+        return res;
+    }
+
+    public void printOutput() {
+        for (Mol mol : statements.values()) {
+            for (Iterator<LabelPair> i = mol.m.iterator(); i.hasNext(); ) {
+                LabelPair p = i.next();
+                System.out.println(p.left.toString() + " " + p.right.toString());
+            }
+        }
+    }
+
 	public void visit(final Statement n) {
 		n.f0.accept(this);
 	}
@@ -28,14 +55,23 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
      * f1: '('
      * f2: Expression
      * f3: ')'
-     * f4: Block()
+     * f4: Block
      */
 	public void visit(final AsyncStatement n) {
-		n.f0.accept(this);
-		n.f1.accept(this);
-		n.f2.accept(this);
-		n.f3.accept(this);
-		n.f4.accept(this);
+        super.visit(n);
+        
+        Mol current = new Mol();
+
+        Mol expression = statements.get(n.f2);
+        Mol block = statements.get(n.f4);
+        // should not be null since these are guaranteed to have been visited
+
+        current.m.addAll(block.m);
+        current.o.addAll(block.l);
+        current.l.addAll(block.l);
+        current.l.add(n);
+
+        statements.put(n, current);
 	}
 
     /*
@@ -55,7 +91,7 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
      *      statement
      */
 	public void visit(final BlockStatement n) {
-		n.f0.accept(this);
+        super.visit(n);
 	}
 
     /*
@@ -63,8 +99,16 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
      * f1: Statement
      */
 	public void visit(final FinishStatement n) {
-		n.f0.accept(this);
-		n.f1.accept(this);
+        super.visit(n);
+
+        Mol current = new Mol();
+        Mol statement = statements.get(n.f1);
+
+        current.m.addAll(statement.m);
+        current.l.addAll(statement.l);
+        current.l.add(n);
+
+        statements.put(n, current);
 	}
 
     /*
@@ -104,14 +148,18 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
      * f7: Statement
      */
 	public void visit(final LoopStatement n) {
-		n.f0.accept(this);
-		n.f1.accept(this);
-		n.f2.accept(this);
-		n.f3.accept(this);
-		n.f4.accept(this);
-		n.f5.accept(this);
-		n.f6.accept(this);
-		n.f7.accept(this);
+        super.visit(n);
+
+        Mol current = new Mol();
+        Mol statement = statements.get(n.f7);
+
+        current.m.addAll(statement.m);
+        current.m.addAll(symCross(statement.o, statement.l));
+        current.o.addAll(statement.o);
+        current.l.addAll(statement.l);
+        current.l.add(n);
+
+        statements.put(n, current);
 	}
 
     /*
@@ -176,11 +224,18 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
      * f4: Statement
      */
 	public void visit(final WhileStatement n) {
-		n.f0.accept(this);
-		n.f1.accept(this);
-		n.f2.accept(this);
-		n.f3.accept(this);
-		n.f4.accept(this);
+        super.visit(n);
+
+        Mol current = new Mol();
+        Mol statement = statements.get(n.f4);
+
+        current.m.addAll(statement.m);
+        current.m.addAll(symCross(statement.o, statement.l));
+        current.o.addAll(statement.o);
+        current.l.addAll(statement.l);
+        current.l.add(n);
+
+        statements.put(n, current);
 	}
 
 }
