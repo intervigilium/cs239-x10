@@ -41,44 +41,33 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         // expressions not previously being recorded
         current.l.add(n.f0.choice);
 
-        statements.put(n.f0.choice, current);
+        statements.put(n, current);
     }
 
 	public void visit(final Statement n) {
         super.visit(n);
+
+        Mol current;
         switch (n.f0.which) {
             case 1:
-                // Async
-                break;
+                // async
             case 3:
-                // Finish
-                break;
+                // finish
             case 5:
-                // Loop
-                break;
+                // loop
             case 10:
-                // While
+                // while
+                current = statements.get(n.f0.choice);
+                statements.put(n, current);
                 break;
             default:
-                Mol current = new Mol();
+                // previously unrecorded statement
+                current = new Mol();
                 current.l.add(n.f0.choice);
-
-                statements.put(n.f0.choice, current);
                 break;
         }
-	}
 
-    /*
-     * f0: Expression
-     * f1: '='
-     * f2: Expression
-     * f3: ';'
-     */
-	public void visit(final Assignment n) {
-		n.f0.accept(this);
-		n.f1.accept(this);
-		n.f2.accept(this);
-		n.f3.accept(this);
+        statements.put(n, current);
 	}
 
     /*
@@ -97,14 +86,21 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         Mol block = statements.get(n.f4);
 
         // do expression and block
-        current.m.addAll(block.m);
-        current.m.addAll(expression.m);
-        current.m.addAll(symCross(expression.o, block.l));
-        // async s: M, L, L
-        current.o.addAll(block.l);
-        current.o.addAll(expression.l);
-        current.l.addAll(block.l);
-        current.l.addAll(expression.l);
+        if (block != null) {
+            current.m.addAll(block.m);
+            current.o.addAll(block.l);
+            current.l.addAll(block.l);
+        }
+
+        if (expression != null) {
+            current.m.addAll(expression.m);
+            current.o.addAll(expression.l);
+            current.l.addAll(expression.l);
+        }
+
+        if (block != null && expression != null) {
+            current.m.addAll(symCross(expression.o, block.l));
+        }
         current.l.add(n);
 
         statements.put(n, current);
@@ -116,9 +112,22 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
      * f2: '}'
      */
 	public void visit(final Block n) {
-		n.f0.accept(this);
-		n.f1.accept(this);
-		n.f2.accept(this);
+        super.visit(n);
+
+        // need to aggregate all blockStatement under block
+        Mol current = new Mol();
+        for (Iterator<INode> i = n.f1.nodes.iterator(); i.hasNext(); ) {
+            INode node = i.next();
+            Mol mol = statements.get(node);
+
+            if (mol != null) {
+                current.m.addAll(mol.m);
+                current.o.addAll(mol.o);
+                current.l.addAll(mol.l);
+                current.m.addAll(symCross(current.o, mol.l));
+            }
+        }
+        statements.put(n, current);
 	}
 
     /*
@@ -141,8 +150,10 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         Mol statement = statements.get(n.f1);
 
         // finish s: M, empty, L
-        current.m.addAll(statement.m);
-        current.l.addAll(statement.l);
+        if (statement != null) {
+            current.m.addAll(statement.m);
+            current.l.addAll(statement.l);
+        }
         current.l.add(n);
 
         statements.put(n, current);
@@ -182,15 +193,21 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
         Mol statement = statements.get(n.f7);
         Mol expression = statements.get(n.f5);
 
-        // do expression and statement
-        current.m.addAll(statement.m);
-        current.m.addAll(expression.m);
-        current.m.addAll(symCross(statement.o, expression.l));
-        current.o.addAll(statement.o);
-        current.o.addAll(expression.o);
-        current.l.addAll(statement.l);
-        current.l.addAll(expression.l);
-        // do loop
+        if (expression != null) {
+            current.m.addAll(expression.m);
+            current.o.addAll(expression.o);
+            current.l.addAll(expression.l);
+        }
+
+        if (statement != null) {
+            current.m.addAll(statement.m);
+            current.o.addAll(statement.o);
+            current.l.addAll(statement.l);
+        }
+
+        if (expression != null && statement != null) {
+            current.m.addAll(symCross(statement.o, expression.l));
+        }
         current.m.addAll(symCross(current.o, current.l));
         current.l.add(n);
 
