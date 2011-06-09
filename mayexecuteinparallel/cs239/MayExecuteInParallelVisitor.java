@@ -64,7 +64,6 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
 
         Mol expression = statements.get(n.f2);
         Mol block = statements.get(n.f4);
-        // should not be null since these are guaranteed to have been visited
 
         current.m.addAll(block.m);
         current.o.addAll(block.l);
@@ -152,11 +151,18 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
 
         Mol current = new Mol();
         Mol statement = statements.get(n.f7);
+        Mol expression = statements.get(n.f5);
 
+        // do expression and statement
         current.m.addAll(statement.m);
-        current.m.addAll(symCross(statement.o, statement.l));
+        current.m.addAll(expression.m);
+        current.m.addAll(symCross(statement.o, expression.l));
         current.o.addAll(statement.o);
+        current.o.addAll(expression.o);
         current.l.addAll(statement.l);
+        current.l.addAll(expression.l);
+        // do loop
+        current.m.addAll(symCross(current.o, current.l));
         current.l.add(n);
 
         statements.put(n, current);
@@ -228,11 +234,18 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
 
         Mol current = new Mol();
         Mol statement = statements.get(n.f4);
+        Mol expression = statements.get(n.f2);
 
+        // do expression and statement
         current.m.addAll(statement.m);
-        current.m.addAll(symCross(statement.o, statement.l));
+        current.m.addAll(expression.m);
+        current.m.addAll(symCross(expression.o, statement.l));
         current.o.addAll(statement.o);
+        current.o.addAll(expression.o);
         current.l.addAll(statement.l);
+        current.l.addAll(expression.l);
+        // do loop
+        current.m.addAll(symCross(current.o, current.l));
         current.l.add(n);
 
         statements.put(n, current);
