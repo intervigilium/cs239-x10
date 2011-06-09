@@ -58,7 +58,7 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
             case 10:
                 // while
                 current = statements.get(n.f0.choice);
-                statements.put(n, current);
+                current.l.add(n);
                 break;
             default:
                 // previously unrecorded statement
@@ -139,6 +139,7 @@ public class MayExecuteInParallelVisitor extends DepthFirstVoidVisitor {
             case 3:
                 // statement
                 current = statements.get(n.f0.choice);
+                current.l.add(n);
                 break;
             default:
                 current = new Mol();
